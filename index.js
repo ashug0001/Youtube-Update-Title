@@ -105,7 +105,7 @@ function getChannel(auth) {
   service.channels.list({
     auth: auth,
     part: 'snippet,contentDetails,statistics',
-    id: 'UCo0ByPiMOgkJF2p9sYgFtsw'
+    id: 'CHANNEL-ID'
   }, function(err, response) {
     if (err) {
       console.log('The API returned an error: ' + err);
