@@ -100,46 +100,18 @@ function storeToken(token) {
  *
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-function getChannel(auth) {
-  var service = google.youtube('v3');
-  service.channels.list({
-    auth: auth,
-    part: 'snippet,contentDetails,statistics',
-    id: 'CHANNEL-ID'
-  }, function(err, response) {
-    if (err) {
-      console.log('The API returned an error: ' + err);
-      return;
-    }
-    var channels = response.data.items;
-    if (channels.length == 0) {
-      console.log('No channel found.');
-    } else {
-      console.log(channels[0].contentDetails.relatedPlaylists.uploads)
-    //   console.log('This channel\'s ID is %s. Its title is \'%s\', and ' +
-    //               'it has %s views.',
-    //               channels[0].id,
-    //               channels[0].snippet.title,
-    //               channels[0].statistics.viewCount);
-    }
-  });
-}
 
-function updateVideo(auth,{count,categoryId}) {
+function updateVideo(auth,video) {
     var service = google.youtube('v3');
+    var viewText = video.statistics.viewCount.toLocaleString();
+    video.snippet.title = `This video has ${viewText} views`;
     service.videos.update({
       auth: auth,
-      part: 'snippet',
-      resource: {
-        id: "VIDEO-ID",
-        snippet: {
-          title: `This video has ${count} views`,
-          categoryId: categoryId
-        }
-      }
+      part: 'snippet,statistics',
+      resource: video,
     }, function(err, response) {
       if (err) {
-        console.log('The API returned an error: ' + err);
+        console.log('The API returned an error updateVideo: ' + err);
         return;
       }
     });
@@ -153,14 +125,10 @@ function getVideo(auth) {
       id: "VIDEO-ID",
     },function(err, response) {
         if(err) {
-            console.log("The API returen an error: '" + err);
+            console.log("The API returen an error getVideo: '" + err);
             return;
         }
-        var result = response.data.items;
-        const video = {
-            count: result[0].statistics.viewCount, 
-            categoryId: result[0].snippet.categoryId
-        };
-        updateVideo(auth, video);
+        var result = response.data.items[0];
+        updateVideo(auth, result);
     });
   }
